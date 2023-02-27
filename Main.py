@@ -13,6 +13,10 @@ os.chdir(os.path.dirname(sys.argv[0]))
 
 def clean(name, set_name):
     name = name.replace(" ", "_")
+    name = name.replace("[Version_2]", "")
+    name = name.replace("(Showcase)", "")
+    name = name.replace("(Extended_Art)", "")
+    name = name.replace("(Foil_Etched)", "")
     set_name = set_name.replace(" ", "_")
     set_name = set_name.replace("_(M15)","")
     set_name = set_name.replace("_(M14)","")
@@ -24,16 +28,14 @@ def clean(name, set_name):
     set_name = set_name.replace("9th_Edition", "Ninth_Edition")
     set_name = set_name.replace("Core_2021","Core_set_2021")
     set_name = set_name.replace(":", "")
+    set_name = set_name.replace("FNM_Promos", "Friday_Night_Magic")
     set_name = set_name.replace("Commander_Streets_of_New_Capenna", "New_Capenna_Commander")
     set_name = set_name.replace("Modern_Horizons_2_Extras", "Modern_Horizons_1_Timeshifts")
-    set_name = set_name.replace("Mystery_Booster_Cards", "Mystery_Booster")
-    name = name.replace("_(Showcase)", "")
-    name = name.replace("_(Extended_Art)", "")
-    if "_(Retro_Frame)_(Foil_Etched)" in name:
-        bonus = "+finishes:['foil','etched']"
-        name = name.replace("_(Retro_Frame)_(Foil_Etched)", "")
-        set_name = "Modern_Horizons_1_Timeshifts"
-
+    set_name = set_name.replace("Mystery_Booster_Cards", "Mystery_Booster") 
+    set_name = set_name.replace("Guilds_of_Ravnica_Guild_Kits", "GRN_Guild_Kit")
+    set_name = set_name.replace("Zendikar_Rising_Commander_Decks", "Zendikar_Rising_Commander")
+    set_name = set_name.replace("The_Brothers'_War_Retro_Frame_Artifacts", "The_Brothers'_War_Retro_Artifacts")
+    set_name = set_name.replace("Commander_Phyrexia_All_Will_Be_One", "Phyrexia_All_Will_Be_One_Commander")
     return(name, set_name)
 
 df = pd.read_excel("inventory.xlsx")
@@ -44,6 +46,8 @@ for index, row in df.iterrows():
     name = row["Card"]
     set_name = row["Set"]
     bonus = ""
+    if "(Foil Etched)" in name:
+        df['Foil'][index] = "Yes"
     name, set_name = clean(name,set_name)
     try:
         # Try to recover data using stryfall ID. 
@@ -66,7 +70,7 @@ for index, row in df.iterrows():
     except TypeError:
         # TypeError occure when there is no ID. Then use name and set.
         try:
-            request = requests.get("https://api.scryfall.com/cards/search?order=set&q=name="+name+"+set="+set_name+bonus)
+            request = requests.get("https://api.scryfall.com/cards/search?order=set&q=name="+name+"+set="+set_name)
 
             if row["Foil"] == "No": 
                 price_eu = request.json()['data'][0]['prices']['eur']
