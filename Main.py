@@ -22,6 +22,7 @@ def clean(name, set_name):
     set_name = set_name.replace("_(M10)","")
     set_name = set_name.replace("10th_Edition", "Tenth_Edition")
     set_name = set_name.replace("9th_Edition", "Ninth_Edition")
+    set_name = set_name.replace("Core_2021","Core_set_2021")
     set_name = set_name.replace(":", "")
     set_name = set_name.replace("Commander_Streets_of_New_Capenna", "New_Capenna_Commander")
     set_name = set_name.replace("Modern_Horizons_2_Extras", "Modern_Horizons_1_Timeshifts")
@@ -48,17 +49,17 @@ for index, row in df.iterrows():
         # Try to recover data using stryfall ID. 
         if row["ID"] == row["ID"]:
             print(row["ID"])
-            request = requests.get("https://api.scryfall.com/cards/"+row["ID"]) # sometimes something crashes here making type error. Mainly badly saved ID
-            if row["Foil"] == "No": 
-                price_eu = request.json()['prices']['eur']
-                price_us = request.json()['prices']['usd']
-            if row["Foil"] == "Yes":
-                price_eu = request.json()['prices']['eur_foil']
-                price_us = request.json()['prices']['usd_foil']
-            df['Eurosy'][index] = price_eu
-            df['Dolary'][index] = price_us
-            df['ID'][index] = f"{request.json()['set']}/{request.json()['collector_number']}"
-            df.to_excel("inventory.xlsx")
+            #request = requests.get("https://api.scryfall.com/cards/"+row["ID"]) # sometimes something crashes here making type error. Mainly badly saved ID
+            #if row["Foil"] == "No": 
+            #    price_eu = request.json()['prices']['eur']
+            #    price_us = request.json()['prices']['usd']
+            #if row["Foil"] == "Yes":
+            #    price_eu = request.json()['prices']['eur_foil']
+            #    price_us = request.json()['prices']['usd_foil']
+            #df['Eurosy'][index] = price_eu
+            #df['Dolary'][index] = price_us
+            #df['ID'][index] = f"{request.json()['set']}/{request.json()['collector_number']}"
+            #df.to_excel("inventory.xlsx",index=False)
         else: 
             i = 1 - "string" # Lazy way to make a Type error xD
 
@@ -77,7 +78,7 @@ for index, row in df.iterrows():
             df['Dolary'][index] = price_us
             # Save the ID
             df['ID'][index] = f"{request.json()['data'][0]['set']}/{request.json()['data'][0]['collector_number']}"
-            df.to_excel("inventory.xlsx")
+            df.to_excel("inventory.xlsx",index=False)
             #print(name+price)
         except KeyError:
             # But sometimes there are error in set name - most commonly - then get all the card version and...
@@ -91,7 +92,7 @@ for index, row in df.iterrows():
                 img.show()                    
             
             # Choose which one to use. 
-            card_id=str(input("Past the ID e.g.[hmm/32] here:"))
+            card_id=str(input("Paste the ID e.g.[hmm/32] here:"))
             # And use this ID to retrieve info normally
             request = requests.get("https://api.scryfall.com/cards/"+card_id)
             if row["Foil"] == "No": 
@@ -104,7 +105,7 @@ for index, row in df.iterrows():
             df['Dolary'][index] = price_us
             # Save the ID
             df['ID'][index] = f"{request.json()['set']}/{request.json()['collector_number']}"
-            df.to_excel("inventory.xlsx")
+            df.to_excel("inventory.xlsx",index=False)
 
 
 
