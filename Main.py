@@ -6,7 +6,8 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import json
 import requests
 import urllib.request
-from PIL import Image                                                                                
+from PIL import Image  
+from datetime import date                                                                              
 
 
 os.chdir(os.path.dirname(sys.argv[0]))
@@ -39,8 +40,6 @@ def clean(name, set_name):
     return(name, set_name)
 
 df = pd.read_excel("inventory.xlsx")
-bonus = ""
-Eurosy = []
 
 for index, row in df.iterrows():
     name = row["Card"]
@@ -53,16 +52,16 @@ for index, row in df.iterrows():
         # Try to recover data using stryfall ID. 
         if row["ID"] == row["ID"]:
             print(row["ID"])
-            #request = requests.get("https://api.scryfall.com/cards/"+row["ID"]) # sometimes something crashes here making type error. Mainly badly saved ID
-            #if row["Foil"] == "No": 
-            #    price_eu = request.json()['prices']['eur']
-            #    price_us = request.json()['prices']['usd']
-            #if row["Foil"] == "Yes":
-            #    price_eu = request.json()['prices']['eur_foil']
-            #    price_us = request.json()['prices']['usd_foil']
-            #df['Eurosy'][index] = price_eu
-            #df['Dolary'][index] = price_us
-            #df['ID'][index] = f"{request.json()['set']}/{request.json()['collector_number']}"
+            request = requests.get("https://api.scryfall.com/cards/"+row["ID"]) # sometimes something crashes here making type error. Mainly badly saved ID
+            if row["Foil"] == "No": 
+                price_eu = request.json()['prices']['eur']
+                price_us = request.json()['prices']['usd']
+            if row["Foil"] == "Yes":
+                price_eu = request.json()['prices']['eur_foil']
+                price_us = request.json()['prices']['usd_foil']
+            df['Euro'][index] = price_eu
+            df['Dolar'][index] = price_us
+            df['ID'][index] = f"{request.json()['set']}/{request.json()['collector_number']}"
             #df.to_excel("inventory.xlsx",index=False)
         else: 
             i = 1 - "string" # Lazy way to make a Type error xD
@@ -70,7 +69,7 @@ for index, row in df.iterrows():
     except TypeError:
         # TypeError occure when there is no ID. Then use name and set.
         try:
-            request = requests.get("https://api.scryfall.com/cards/search?order=set&q=name="+name+"+set="+set_name)
+            request = requests.get("https://api.scryfall.com/cards/search?order=set&q=name=!'"+name+"'+set="+set_name)
 
             if row["Foil"] == "No": 
                 price_eu = request.json()['data'][0]['prices']['eur']
@@ -78,11 +77,11 @@ for index, row in df.iterrows():
             if row["Foil"] == "Yes":
                 price_eu = request.json()['data'][0]['prices']['eur_foil']
                 price_us = request.json()['data'][0]['prices']['usd_foil']
-            df['Eurosy'][index] = price_eu
-            df['Dolary'][index] = price_us
+            df['Euro'][index] = price_eu
+            df['Dolar'][index] = price_us
             # Save the ID
             df['ID'][index] = f"{request.json()['data'][0]['set']}/{request.json()['data'][0]['collector_number']}"
-            df.to_excel("inventory.xlsx",index=False)
+            #df.to_excel("inventory.xlsx",index=False)
             #print(name+price)
         except KeyError:
             # But sometimes there are error in set name - most commonly - then get all the card version and...
@@ -105,11 +104,18 @@ for index, row in df.iterrows():
             if row["Foil"] == "Yes":
                 price_eu = request.json()['prices']['eur_foil']
                 price_us = request.json()['prices']['usd_foil']
-            df['Eurosy'][index] = price_eu
-            df['Dolary'][index] = price_us
+            df['Euro'][index] = price_eu
+            df['Dolar'][index] = price_us
             # Save the ID
             df['ID'][index] = f"{request.json()['set']}/{request.json()['collector_number']}"
-            df.to_excel("inventory.xlsx",index=False)
+            #df.to_excel("inventory.xlsx",index=False)
+
+
+today = date.today()
+df['Euro_'+str(today)] = df['Euro']
+df['Dolar_'+str(today)] = df['Dolar']
+df.to_excel("inventory.xlsx",index=False)
+print('Done :)')
 
 
 
