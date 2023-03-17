@@ -7,7 +7,6 @@ import urllib.request
 from PIL import Image  
 from datetime import date                                                                              
 
-
 os.chdir(os.path.dirname(sys.argv[0]))
 
 def clean(name, set_name):
@@ -37,7 +36,7 @@ def clean(name, set_name):
     set_name = set_name.replace("Commander_Phyrexia_All_Will_Be_One", "Phyrexia_All_Will_Be_One_Commander")
     return(name, set_name)
 
-df = pd.read_excel("inventory.xlsx")
+df = pd.read_excel("inventory.xlsx") #If you want many files here is the place 
 
 for index, row in df.iterrows():
     name = row["Card"]
@@ -114,13 +113,3 @@ df['Euro_'+str(today)] = df['Euro']
 df['Dolar_'+str(today)] = df['Dolar']
 df.to_excel("inventory.xlsx",index=False)
 print('Done :)')
-
-
-
-    
-
-
-
-
-
-
