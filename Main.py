@@ -1,6 +1,6 @@
 import sys
 import os
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import pandas as pd # data processing, data file I/O (e.g. pd.read_excel)
 import json
 import requests
 import urllib.request
